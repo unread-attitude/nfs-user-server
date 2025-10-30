@@ -10,6 +10,7 @@
 #include "logging.h"
 #include "signals.h"
 #include <sys/wait.h>
+#include <time.h>
 #ifdef HAVE_STRSIGNAL
 #include <string.h>
 #else

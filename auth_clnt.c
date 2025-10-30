@@ -14,6 +14,7 @@
 
 #include "system.h"
 #include "nfsd.h"
+#include "rpcmisc.h"
 #include "fakefsuid.h"
 
 #ifndef svc_getcaller
@@ -38,10 +39,10 @@ gid_t		*cred_gids;
 int		cred_len;
 
 #if defined(HAVE_AUTHDES_GETUCRED) && !defined(HAVE_AUTHDES_GETUCRED_DECL)
+#endif
 /* authdes_getucred is not exported in svcauth.h even if present. */
 extern int authdes_getucred(caddr_t credptr, short *uid,
 				short *gid, short *nrgids, int *groups);
-#endif
 
 
 /*
@@ -52,7 +53,7 @@ nfs_client *
 auth_clnt(struct svc_req *rqstp)
 {
 	nfs_client	*cp = NULL;
-	struct in_addr addr = svc_getcaller(rqstp->rq_xprt)->sin_addr;
+	struct in_addr addr = nfs_getrpccaller_in(rqstp->rq_xprt)->sin_addr;
 
 	/* Get the client and list of exports */
 	if ((cp = auth_clientbyaddr(addr)) != NULL)
@@ -83,7 +84,7 @@ auth_path(nfs_client *cp, struct svc_req *rqstp, char *path)
 
 	/* Check request originated on a privileged port. */
 	if (!allow_non_root && mp->o.secure_port
-	 && !SECURE_PORT(svc_getcaller(rqstp->rq_xprt)->sin_port)) {
+	 && !SECURE_PORT(nfs_getrpccaller_in(rqstp->rq_xprt)->sin_port)) {
 		Dprintf(L_ERROR,
 		    "NFS request from %s originated on insecure port, %s\n",
 		    cp->clnt_name,
@@ -127,7 +128,7 @@ void auth_user(nfs_mount *mp, struct svc_req *rqstp)
 	} else if (rqstp->rq_cred.oa_flavor == AUTH_DES) {
 		static GETGROUPS_T des_gids[NGRPS];
 		struct authdes_cred *cred;
-		short	grplen = NGRPS;
+		int	grplen = NGRPS;
 		int	i;
 
 		cred = (struct authdes_cred *) rqstp->rq_clntcred;

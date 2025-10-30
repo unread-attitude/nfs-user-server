@@ -131,7 +131,7 @@ auth_fh(struct svc_req *rqstp, nfs_fh *fh, nfsstat *statp, int flags)
 	if (nfsclient == NULL) {
 		struct in_addr	caddr;
 
-		caddr = svc_getcaller(rqstp->rq_xprt)->sin_addr;
+		caddr = nfs_getrpccaller_in(rqstp->rq_xprt)->sin_addr;
 		if (fhc->last_clnt != NULL &&
 		    fhc->last_clnt->clnt_addr.s_addr == caddr.s_addr) {
 			nfsclient = fhc->last_clnt;
@@ -162,7 +162,7 @@ auth_fh(struct svc_req *rqstp, nfs_fh *fh, nfsstat *statp, int flags)
 
 	if (nfsmount->o.noaccess &&
 	    ((flags & CHK_NOACCESS) || strcmp(nfsmount->path, fhc->path))) {
-		struct in_addr	addr = svc_getcaller(rqstp->rq_xprt)->sin_addr;
+		struct in_addr	addr = nfs_getrpccaller_in(rqstp->rq_xprt)->sin_addr;
 		Dprintf(L_WARNING, "client %s tried to access %s (noaccess)\n",
 				inet_ntoa(addr), fhc->path);
 		*statp = NFSERR_ACCES;
@@ -224,7 +224,7 @@ build_path(struct svc_req *rqstp, char *buf, diropargs *dopa, int flags)
 static void
 nfsd_xferlog(struct svc_req *rqstp, char *inout, char *pathname)
 {
-	struct in_addr	addr = svc_getcaller(rqstp->rq_xprt)->sin_addr;
+	struct in_addr	addr = nfs_getrpccaller_in(rqstp->rq_xprt)->sin_addr;
 
 	syslog(LOG_INFO, "%s %s %s", inet_ntoa(addr), inout, pathname);
 }

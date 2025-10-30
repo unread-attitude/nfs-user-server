@@ -17,6 +17,7 @@
 #include <config.h>
 #endif
 
+#include <sys/sysmacros.h>
 #include <sys/types.h>
 #if defined(HAVE_UNISTD_H) || defined(STDC_HEADERS)
 #include <unistd.h>

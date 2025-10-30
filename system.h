@@ -34,13 +34,6 @@
 #include <stdio.h>
 
 #include <rpc/rpc.h>
-#ifndef HAVE_XDRPROC_T
-#ifdef __STDC__
-typedef bool_t	(*xdrproc_t)(XDR *, void *, ...);
-#else
-typedef bool_t	(*xdrproc_t)();
-#endif
-#endif
 
 #include <ctype.h>
 #include <errno.h>

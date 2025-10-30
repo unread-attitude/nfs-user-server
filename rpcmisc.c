@@ -25,6 +25,7 @@
 #include <memory.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <time.h>
 #include "rpcmisc.h"
 #include "logging.h"
 
@@ -55,7 +56,7 @@ rpc_init(const char *name, int prog, int *verstbl, void (*dispatch)(),
 	struct sockaddr_in saddr;
 	SVCXPRT	*transp;
 	int	sock, i, vers;
-	int	asize;
+	uint	asize;
 
 	/* When started from inetd, initialize only once */
 	if (_rpcpmstart)
@@ -64,7 +65,7 @@ rpc_init(const char *name, int prog, int *verstbl, void (*dispatch)(),
 	asize = sizeof(saddr);
 	sock = 0;
 	if (getsockname(0, (struct sockaddr *) &saddr, &asize) == 0) {
-		int	ssize = sizeof (i);
+		uint	ssize = sizeof (i);
 
 		if (saddr.sin_family != AF_INET)
 			goto not_inetd;
@@ -144,7 +145,8 @@ rpc_closedown(void)
 	struct sockaddr_in	sin;
 	static int		size = 0;
 	time_t			now = time(NULL);
-	int			i, len;
+	int			i;
+        uint len;
 
 	if (!_rpcpmstart || now < closedown)
 		return;

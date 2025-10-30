@@ -171,15 +171,15 @@ have experienced problems with files suddenly turning into direcotries,
 or vice versa, try this feature.
 
 EOF
-DEVTAB=`read_yesno "Enable new inode number scheme?" n $devtab`
+DEVTAB=`read_yesno "Enable new inode number scheme?" y $devtab`
 
 if [ "$DEVTAB" = Y ]; then
 	echo 
 	echo "The NFS server will need a file in which to store the device number mapping."
-	echo -n "Please enter file name [/var/state/nfs/devtab]: "
+	echo -n "Please enter file name [/opt/nfs-user-server/state/devtab]: "
 	read PATH_DEVTAB
 	if [ -z "$PATH_DEVTAB" ]; then
-		PATH_DEVTAB=/var/state/nfs/devtab
+		PATH_DEVTAB=/opt/nfs-user-server/state/devtab
 	fi
 	echo
 fi
@@ -260,7 +260,7 @@ EOF
 
 
 test "$USE_UGIDD" = "Y" && _and_ugidd=" and ugidd"
-USE_HSTACS=`read_yesno "Do you want to protect mountd$_and_ugidd with HOST ACCESS?" y \
+USE_HSTACS=`read_yesno "Do you want to protect mountd$_and_ugidd with HOST ACCESS?" n \
 		$hosts_access`
 
 if [ "$USE_HSTACS" = "Y" ]; then

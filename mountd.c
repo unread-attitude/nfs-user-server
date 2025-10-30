@@ -125,7 +125,7 @@ mountproc_mnt_1_svc(dirpath *argp, struct svc_req *rqstp)
 	}
 
 #ifdef WANT_LOG_MOUNTS
-	addr = svc_getcaller(rqstp->rq_xprt)->sin_addr;
+	addr = nfs_getrpccaller_in(rqstp->rq_xprt)->sin_addr;
 	Dprintf(L_NOTICE, "NFS mount of %s attempted from %s\n",
 				argbuf, inet_ntoa(addr));
 #endif /* WANT_LOG_MOUNTS */

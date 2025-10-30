@@ -11,6 +11,7 @@
  *		as is, with no warranty expressed or implied.
  */
 
+#include <time.h>
 #include "nfsd.h"
 #include "nfs_prot.h"
 #include "rpcmisc.h"

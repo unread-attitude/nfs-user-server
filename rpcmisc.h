@@ -17,4 +17,14 @@ extern void		rpc_init(const char *name, int prog, int *verstbl,
 extern void		rpc_exit(int prog, int *verstbl);
 extern void		rpc_closedown(void);
 
+static inline struct sockaddr_in *nfs_getrpccaller_in(SVCXPRT *xprt)
+{
+        return (struct sockaddr_in *)(char *)svc_getcaller(xprt);
+}
+
+static inline struct sockaddr *nfs_getrpccaller(SVCXPRT *xprt)
+{
+        return (struct sockaddr *)(char *)svc_getcaller(xprt);
+}
+
 #endif /* RPCMISC_H */

@@ -978,9 +978,7 @@ nfs_mount *
 auth_add_mount(nfs_client *cp, char *path, int override)
 {
 	nfs_mount	*mp, **mpp;
-	int		len, tmp;
-
-	len = strlen(path);
+	int		tmp;
 
 	/* Locate position of mount point in list of mount.
 	 * Insert more specific path before less specific path.
