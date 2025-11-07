@@ -14,8 +14,8 @@
 
 #include "system.h"
 #include "nfsd.h"
-#include "rpcmisc.h"
 #include "fakefsuid.h"
+#include "rpcmisc.h"
 
 #ifndef svc_getcaller
 #define svc_getcaller(x) ((struct sockaddr_in *) &(x)->xp_rtaddr.buf)
@@ -39,10 +39,10 @@ gid_t		*cred_gids;
 int		cred_len;
 
 #if defined(HAVE_AUTHDES_GETUCRED) && !defined(HAVE_AUTHDES_GETUCRED_DECL)
-#endif
 /* authdes_getucred is not exported in svcauth.h even if present. */
 extern int authdes_getucred(caddr_t credptr, short *uid,
 				short *gid, short *nrgids, int *groups);
+#endif
 
 
 /*
@@ -128,7 +128,7 @@ void auth_user(nfs_mount *mp, struct svc_req *rqstp)
 	} else if (rqstp->rq_cred.oa_flavor == AUTH_DES) {
 		static GETGROUPS_T des_gids[NGRPS];
 		struct authdes_cred *cred;
-		int	grplen = NGRPS;
+		short	grplen = NGRPS;
 		int	i;
 
 		cred = (struct authdes_cred *) rqstp->rq_clntcred;

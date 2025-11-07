@@ -109,10 +109,8 @@ mount_dispatch(struct svc_req *rqstp, SVCXPRT *transp)
 	unsigned int		proc_index, vers_index;
 	struct dispatch_entry	*dtbl, *dent;
 	union result_types	*resp;
-	struct sockaddr_in	*sin;
 
-	sin = (struct sockaddr_in *) svc_getcaller(transp);
-	if (!client_checkaccess("rpc.mountd", sin, 0))
+	if (!client_checkaccess("rpc.mountd", svc_getcaller(transp), 0))
 		goto done;
 
 	proc_index = rqstp->rq_proc;

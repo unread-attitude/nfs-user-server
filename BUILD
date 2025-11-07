@@ -160,6 +160,30 @@ cat << EOF
 
 EOF
 
+echo 
+echo "The NFS server will need a file in which to store the device number mapping."
+echo -n "Please enter file name [/opt/nfs-user-server]: "
+read PATH_PREFIX
+if [ -z "$PATH_PREFIX" ]; then
+	PATH_PREFIX=/opt/nfs-user-server
+fi
+echo
+
+
+CFLAGS_SAVE="${CFLAGS}"
+if [ -z "$CFLAGS_SAVE" ]; then
+	CFLAGS_SAVE='-I/usr/include/tirpc'
+fi
+echo 
+echo "Revize the CFLAGS as necessary."
+echo -n "Please enter CFLAGS [${CFLAGS_SAVE}]: "
+read CFLAGS
+if [ -z "$CFLAGS" ]; then
+	CFLAGS=${CFLAGS_SAVE}
+fi
+echo
+export CFLAGS
+
 cat << EOF
 +------------------+
 | Big HD support   |
@@ -171,15 +195,15 @@ have experienced problems with files suddenly turning into direcotries,
 or vice versa, try this feature.
 
 EOF
-DEVTAB=`read_yesno "Enable new inode number scheme?" y $devtab`
+DEVTAB=`read_yesno "Enable new inode number scheme?" n $devtab`
 
 if [ "$DEVTAB" = Y ]; then
 	echo 
 	echo "The NFS server will need a file in which to store the device number mapping."
-	echo -n "Please enter file name [/opt/nfs-user-server/state/devtab]: "
+	echo -n "Please enter file name [${PATH_PREFIX}/state/devtab]: "
 	read PATH_DEVTAB
 	if [ -z "$PATH_DEVTAB" ]; then
-		PATH_DEVTAB=/opt/nfs-user-server/state/devtab
+		PATH_DEVTAB=${PATH_PREFIX}/state/devtab
 	fi
 	echo
 fi
@@ -194,7 +218,7 @@ in read/write mode (previous release were strictly read-only when running
 more than one NFS daemon).
 
 EOF
-MULTI_NFSD=`read_yesno "Enable R/W support for multiple daemons?" y $multi`
+MULTI_NFSD=`read_yesno "Enable R/W support for multiple daemons?" n $multi`
 
 cat << EOF
 +---------------------+
@@ -230,6 +254,13 @@ else
 fi
 
 USE_NIS=`read_yesno "Are you going to use NIS uid mapping?" n $nis`
+
+echo
+echo -n "Select path for exports file [${PATH_PREFIX}/etc/exports] ";
+read PATH_EXPORTS
+if [ -z "$PATH_EXPORTS" ]; then
+	PATH_EXPORTS=${PATH_PREFIX}/etc/exports
+fi
 
 cat << EOF
 
@@ -387,6 +418,15 @@ else
 fi
 echo
 echo "/*"
+echo " * If ENABLE_DEVTAB is defined, nfsd will use the new inode"
+echo " * number generation scheme for avoiding inode number clashes"
+echo " * on big hard disks."
+echo " */"
+if [ "$PATH_EXPORTS" != "/etc/exports" ]; then
+  echo "#define EXPORTSFILE	\"$PATH_EXPORTS\""
+fi
+echo
+echo "/*"
 echo " * If MULTIPLE_SERVER_READWRITE is defined, you will be able "
 echo " * to run several nfsd process in parallel servicing all NFS "
 echo " * requests."
@@ -488,7 +528,7 @@ if ! $batch; then
 	echo -n "Please press return to continue "; read foo
 fi
 
-sh configure
+sh configure --prefix=${PATH_PREFIX}
 if [ $? -ne 0 ]; then
   echo
   echo

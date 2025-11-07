@@ -5,3 +5,4 @@
 #/home/joe       pc001(rw,all_squash,anonuid=150,anongid=100)
 #/pub            (ro,insecure,all_squash)
 #/pub/private    (noaccess)
+/data/retronas	 (rw,insecure,all_squash,anongid=1001,anonuid=1001)

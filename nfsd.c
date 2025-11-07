@@ -860,7 +860,7 @@ nfsd_nfsproc_readdir_2(readdirargs *argp, struct svc_req *rqstp)
 	DIR		*dirp;
 	struct dirent	*dp;
 	struct stat	sbuf;
-	int		res_size, dotsonly, hidedot, first;
+	int		res_size, dotsonly, hidedot, first, d_idx;
 	fhcache		*h;
 	nfsstat		status;
 	ino_t		dotinum = 0;
@@ -896,14 +896,34 @@ nfsd_nfsproc_readdir_2(readdirargs *argp, struct svc_req *rqstp)
 	if ((dirp = efs_opendir(h->path)) == NULL)
 		return ((errno ? nfs_errno() : NFSERR_NAMETOOLONG));
 
-	res_size = 0;
-	memcpy(&dloc, argp->cookie, sizeof(dloc));
-	if (dloc != 0)
-		efs_seekdir(dirp, ntohl(dloc));
+	/* soooo. Good news and bad news about telldir/seekdir.
+	   The good news? They're probably more secure than they used to be when
+	   usermode NFS was a thing. The bad news? 
+	       Up to glibc 2.1.1, the return type of telldir() was off_t.  POSIX.1-2001
+	       specifies long, and this is the type used since glibc 2.1.2.
+           And for our purposes long is 8 bytes.  Meanwhile, NFSv2 sez
+		const COOKIESIZE = 4;
 
+           The strategy below is probably stupid. But it works (I think). And I am
+           a bear of very little brain. */
+		
+	memcpy(&dloc, argp->cookie, sizeof(dloc));
+        d_idx = ntohl(dloc);
+        if ( d_idx < 0 ) {
+		return (NFSERR_STALE);
+        } else if (d_idx > 0) {
+		for (int itr=1; itr <= d_idx; itr++) {
+			if ((dp = efs_readdir(dirp)) == NULL) {
+				return (NFSERR_STALE);
+			}
+		}
+        }
+
+	res_size = 0;
 	first = 1;
 	ep = &(result.readdirres.readdirres_u.reply.entries);
 	while ((dp = efs_readdir(dirp)) != NULL) {
+		d_idx++;
 		res_size += dpsize(dp);
 		if (res_size >= argp->count && !first)
 			break;
@@ -923,7 +943,7 @@ nfsd_nfsproc_readdir_2(readdirargs *argp, struct svc_req *rqstp)
 		e->fileid = pseudo_inode(dp->d_ino, sbuf.st_dev);
 		e->name = xmalloc(NLENGTH(dp) + 1);
 		strcpy(e->name, dp->d_name);
-		dloc = htonl(efs_telldir(dirp));
+		dloc = htonl(d_idx);
 		memcpy(&e->cookie, &dloc, sizeof(nfscookie));
 		ep = &e->nextentry;
 		first = 0;
@@ -1223,7 +1243,7 @@ terminate(void)
 	efs_shutdown();
 }
 
-RETSIGTYPE reinitialize(sig)
+RETSIGTYPE reinitialize(int sig)
 {
 	static volatile int	inprogress = 0;
 

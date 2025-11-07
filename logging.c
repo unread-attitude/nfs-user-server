@@ -147,9 +147,9 @@ Dprintf(int kind, const char *fmt, ...)
 	if (log_fp != (FILE *) NULL) {
 		(void) time(&now);
 		tm = localtime(&now);
-		fprintf(log_fp, "%s %02d/%02d/%02d %02d:%02d %s",
-		      log_name, tm->tm_mon + 1, tm->tm_mday, tm->tm_year,
-			tm->tm_hour, tm->tm_min, buff);
+		fprintf(log_fp, "%s %02d/%02d/%04d %02d:%02d:%02d %s",
+		      log_name, tm->tm_mon + 1, tm->tm_mday, tm->tm_year+1900,
+			tm->tm_hour, tm->tm_min, tm->tm_sec, buff);
 		if (strchr(buff, '\n') == NULL)
 			fputc('\n', log_fp);
 	}
@@ -180,10 +180,10 @@ log_call(struct svc_req *rqstp, char *xname, char *arg)
 		struct tm *tm;
 
 		unix_cred = (struct authunix_parms *) rqstp->rq_clntcred;
-		tm = localtime(&unix_cred->aup_time);
+		tm = localtime( (const time_t *) &unix_cred->aup_time);
 		snprintf(buffer + len, total - len,
 			"%d/%d/%d %02d:%02d:%02d %s %d.%d",
-			tm->tm_year, tm->tm_mon + 1, tm->tm_mday,
+			tm->tm_year+1900 , tm->tm_mon + 1, tm->tm_mday,
 			tm->tm_hour, tm->tm_min, tm->tm_sec,
 			unix_cred->aup_machname,
 			unix_cred->aup_uid,

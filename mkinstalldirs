@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Make directory hierarchy. 
 # Written by Noah Friedman <friedman@prep.ai.mit.edu>
 # Public domain.

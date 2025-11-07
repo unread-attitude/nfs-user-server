@@ -7,8 +7,8 @@
  */
 
 #include "nfsd.h"
-#include "rpcmisc.h"
 #include "rmtab.h"
+#include "rpcmisc.h"
 
 static char *	rmtab_gethost(struct svc_req *);
 static int	rmtab_insert(char *, char *);
@@ -318,7 +318,6 @@ rmtab_file(char op)
 
 		if (stat(_PATH_RMTAB, &newstat)) {
 			Dprintf(L_ERROR, "failed to stat '%s'\n", _PATH_RMTAB);
-			fclose(fp);
 			return;
 		}
 		old_st_mtime = newstat.st_mtime;

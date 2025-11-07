@@ -17,7 +17,6 @@
 #include <config.h>
 #endif
 
-#include <sys/sysmacros.h>
 #include <sys/types.h>
 #if defined(HAVE_UNISTD_H) || defined(STDC_HEADERS)
 #include <unistd.h>
@@ -52,12 +51,7 @@ extern int errno;
 #endif
 #endif
 
-#ifdef MAJOR_IN_MKDEV
-#include <sys/mkdev.h>
-#endif
-#ifdef MAJOR_IN_SYSMACROS
 #include <sys/sysmacros.h>
-#endif
 
 int
 nfsmounted(const char *path, struct stat *sbp)

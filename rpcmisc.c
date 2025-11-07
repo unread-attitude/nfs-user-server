@@ -15,7 +15,8 @@
 #include "system.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <rpc/pmap_clnt.h> 
+#include <time.h>
+#include <rpc/rpcb_clnt.h> 
 #include <string.h> 
 #include <signal.h>
 #include <sys/ioctl.h> 
@@ -25,7 +26,6 @@
 #include <memory.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <time.h>
 #include "rpcmisc.h"
 #include "logging.h"
 
@@ -78,7 +78,7 @@ rpc_init(const char *name, int prog, int *verstbl, void (*dispatch)(),
 	} else {
 not_inetd:
 		for (i = 0; (vers = verstbl[i]) != 0; i++)
-			pmap_unset(prog, vers);
+			rpcb_unset(prog, vers, NULL);
 		sock = RPC_ANYSOCK;
 	}
 
@@ -136,7 +136,7 @@ rpc_exit(int prog, int *verstbl)
 	if (_rpcpmstart)
 		return;
 	for (i = 0; (vers = verstbl[i]) != 0; i++)
-		pmap_unset(prog, vers);
+		rpcb_unset(prog, vers, NULL);
 }
 
 void
@@ -145,8 +145,7 @@ rpc_closedown(void)
 	struct sockaddr_in	sin;
 	static int		size = 0;
 	time_t			now = time(NULL);
-	int			i;
-        uint len;
+	uint			i, len;
 
 	if (!_rpcpmstart || now < closedown)
 		return;

@@ -50,6 +50,7 @@ AC_ALLOCA
 AC_CHECK_LIB(nsl, main)
 AC_CHECK_LIB(socket, main)
 AC_CHECK_LIB(rpc, main)
+AC_CHECK_LIB(tirpc, main)
 AC_CHECK_LIB(crypt, main)
 AC_CHECK_LIB(nys, main)
 AC_REPLACE_FUNCS(strerror realpath mkdir rename utimes strdup strstr getopt getopt_long)
